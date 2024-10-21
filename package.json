@@ -11,11 +11,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.1"
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "oauth": "^0.10.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.7.7",
+    "@types/oauth": "^0.9.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
   }
