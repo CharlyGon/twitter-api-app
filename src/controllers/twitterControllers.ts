@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import {  postTweet } from "../services/twitterSercive";
-import {  getStoredAccessToken, setCodeVerifier } from "../globals";
+import { getMockPosts, getRealPosts, postTweet } from "../services/twitterSercive";
+import { getStoredAccessToken, setCodeVerifier } from "../globals";
 import { authenticate } from "../services/auth/authService";
+import { Tweet } from "../interfaces/tweet";
 
 /**
  * Controller to authenticate the user.
@@ -53,5 +54,48 @@ export const createTweet = async (req: Request, res: Response): Promise<void> =>
     } catch (error) {
         console.error('Error creando el tweet:', error);
         res.status(500).send('Error creando el tweet. Por favor, intenta nuevamente más tarde.');
+    }
+};
+
+/**
+ * Controller to get the actual posts from Twitter based on the parameters provided.
+ * @param  {Request} req -   Object containing the parameters needed for post search.
+ * @param  {Response} res -   Object that is used to return the search results.
+ * @returns {Promise<void>} - Promise that is resolved when the response has been sent.
+ */
+export const getTweetsController = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const maxCount = parseInt(req.query.maxCount as string);
+        const maxMinutes = parseInt(req.query.maxMinutes as string);
+
+        if (isNaN(maxCount) || isNaN(maxMinutes)) {
+            res.status(400).send('maxCount y maxMinutes deben ser números válidos.');
+            return;
+        }
+
+        const hashtags = (req.query.hashtags as string)
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter((tag) => tag.length > 0);
+
+        if (hashtags.length === 0) {
+            res.status(400).send('Debes proporcionar al menos un hashtag válido.');
+            return;
+        }
+
+        const useMock = req.query.useMock === 'true';
+
+        let posts: Tweet[];
+
+        if (useMock) {
+            posts = getMockPosts(maxCount, maxMinutes, hashtags);
+        } else {
+            posts = await getRealPosts(maxCount, maxMinutes, hashtags);
+        }
+
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error obteniendo los tweets:', error);
+        res.status(500).send('Error obteniendo los tweets.');
     }
 };
