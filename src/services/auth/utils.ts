@@ -25,6 +25,12 @@ export const generateState = (): string => {
     return crypto.randomBytes(16). toString('hex');
 }
 
+/**
+ * Generates a base64-encoded string with the provided client ID and client secret.
+ * @param {string} clientId - The client ID.
+ * @param {string} clientSecret - The client secret.
+ * @returns {string} - The base64-encoded string.
+ */
 export const generateBase64Credentials = (clientId: string, clientSecret: string): string => {
     return Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
   };
